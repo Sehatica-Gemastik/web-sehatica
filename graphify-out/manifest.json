@@ -1,0 +1,37 @@
+{
+  "eslint.config.mjs": {
+    "mtime": 1786011051.2386978,
+    "ast_hash": "6c4307ffa009658f5c97f5629094c0c2",
+    "semantic_hash": "6c4307ffa009658f5c97f5629094c0c2"
+  },
+  "next.config.ts": {
+    "mtime": 1786011051.2396975,
+    "ast_hash": "bb161273cdaacae5be7be447a6f29aed",
+    "semantic_hash": "bb161273cdaacae5be7be447a6f29aed"
+  },
+  "package.json": {
+    "mtime": 1786011051.2406974,
+    "ast_hash": "96e755dff58f2166c808c87640ab648d",
+    "semantic_hash": "96e755dff58f2166c808c87640ab648d"
+  },
+  "postcss.config.mjs": {
+    "mtime": 1786011051.2406974,
+    "ast_hash": "481fac0fdecd70e1821cc30b86030c1a",
+    "semantic_hash": "481fac0fdecd70e1821cc30b86030c1a"
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1786011051.2562234,
+    "ast_hash": "e7595f79a62a5fbce0df374a5657c756",
+    "semantic_hash": "e7595f79a62a5fbce0df374a5657c756"
+  },
+  "src/app/page.tsx": {
+    "mtime": 1786011051.257228,
+    "ast_hash": "e419f39454820aecadd947cef230146d",
+    "semantic_hash": "e419f39454820aecadd947cef230146d"
+  },
+  "tsconfig.json": {
+    "mtime": 1786011051.278178,
+    "ast_hash": "0a2f4ed9289b65cd3feb4fb4ab3a4fcd",
+    "semantic_hash": "0a2f4ed9289b65cd3feb4fb4ab3a4fcd"
+  }
+}
