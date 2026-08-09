@@ -34,3 +34,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Graphify setup
+
+Knowledge graph of the codebase lives in `graphify-out/` (code-only mode, no LLM/API key used).
+
+If there are more updates on the project, restart the graphify:
+```terminal
+graphify extract . --code-only
+graphify cluster-only .
+```
+
+To include docs/semantic edges (needs an LLM API key), drop `--code-only` and add `--mode deep`.
