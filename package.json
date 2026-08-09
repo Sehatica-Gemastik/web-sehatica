@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "bun node_modules/next/dist/bin/next dev -p 3001",
+    "build": "bun node_modules/next/dist/bin/next build",
+    "start": "bun node_modules/next/dist/bin/next start -p 3001",
+    "lint": "bun node_modules/eslint/bin/eslint.js",
+    "typecheck": "bun node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
     "next": "16.2.12",
