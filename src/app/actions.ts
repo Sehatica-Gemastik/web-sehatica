@@ -44,6 +44,79 @@ export async function login(formData: FormData) {
   redirect('/');
 }
 
+export async function registerDoctor(formData: FormData) {
+  const name = String(formData.get('name') ?? '').trim();
+  const email = String(formData.get('email') ?? '').trim();
+  const password = String(formData.get('password') ?? '');
+  const phone = String(formData.get('phone') ?? '').trim();
+  const specialty = String(formData.get('specialty') ?? '').trim();
+  const bio = String(formData.get('bio') ?? '').trim();
+
+  if (!name || !email || !password || !specialty) {
+    redirect('/register?error=Nama,+email,+password,+dan+spesialisasi+wajib+diisi');
+  }
+
+  try {
+    const auth = await backendRequest<AuthPayload>('/auth/register-doctor', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, phone, specialty, bio }),
+    });
+    await saveTokens(auth.accessToken, auth.refreshToken);
+  } catch (error) {
+    const message = error instanceof BackendError
+      ? error.message
+      : (error instanceof Error ? error.message : 'Pendaftaran dokter gagal');
+    redirect(`/register?error=${encodeURIComponent(message)}`);
+  }
+  redirect('/');
+}
+
+export async function updateDoctorProfile(formData: FormData) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ACCESS_COOKIE)?.value;
+  if (!token) redirect('/login');
+
+  const name = String(formData.get('name') ?? '').trim();
+  const phone = String(formData.get('phone') ?? '').trim();
+  const specialty = String(formData.get('specialty') ?? '').trim();
+  const feePerQna = String(formData.get('feePerQna') ?? '25000').trim();
+  const bio = String(formData.get('bio') ?? '').trim();
+  const isAvailable = formData.get('isAvailable') === 'on';
+
+  try {
+    await backendRequest('/doctors/me', {
+      method: 'PATCH',
+      body: JSON.stringify({ name, phone, specialty, feePerQna, bio, isAvailable }),
+    }, token);
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal memperbarui profil';
+    redirect(`/profile?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath('/profile');
+  revalidatePath('/');
+  redirect('/profile?updated=1');
+}
+
+export async function claimVoluntaryReview(formData: FormData) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ACCESS_COOKIE)?.value;
+  if (!token) redirect('/login');
+
+  const reviewId = Number(formData.get('reviewId'));
+  if (!reviewId) redirect('/?error=Pilih+request+yang+valid');
+
+  try {
+    await backendRequest(`/reviews/${reviewId}/claim-voluntary`, {
+      method: 'POST',
+    }, token);
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal mengklaim request sukarela';
+    redirect(`/?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath('/');
+  redirect('/?claimed=1');
+}
+
 export async function logout() {
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_COOKIE)?.value;
@@ -55,13 +128,13 @@ export async function logout() {
   redirect('/login');
 }
 
-async function reviewRequest(path: string, body: unknown) {
+async function authenticatedFetch(path: string, method: string, body: unknown) {
   const cookieStore = await cookies();
   let accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
   if (!accessToken) redirect('/login');
 
   try {
-    return await backendRequest(path, { method: 'PATCH', body: JSON.stringify(body) }, accessToken);
+    return await backendRequest(path, { method, body: JSON.stringify(body) }, accessToken);
   } catch (error) {
     if (!(error instanceof BackendError) || error.status !== 401) throw error;
     const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
@@ -72,20 +145,41 @@ async function reviewRequest(path: string, body: unknown) {
     });
     await saveTokens(refreshed.accessToken, refreshed.refreshToken);
     accessToken = refreshed.accessToken;
-    return backendRequest(path, { method: 'PATCH', body: JSON.stringify(body) }, accessToken);
+    return backendRequest(path, { method, body: JSON.stringify(body) }, accessToken);
   }
 }
 
 export async function decideReview(formData: FormData) {
   const id = Number(formData.get('reviewId'));
   const status = String(formData.get('status') ?? '');
-  const note = String(formData.get('note') ?? '').trim();
+  const doctorSummaryNote = String(formData.get('doctorSummaryNote') ?? '').trim();
+  const doctorNote = String(formData.get('note') ?? '').trim() || doctorSummaryNote;
+
   if (!Number.isInteger(id) || (status !== 'approved' && status !== 'revised')) {
     redirect('/?error=Keputusan+tidak+valid');
   }
 
+  // Collect item-level notes if present
+  const items: Array<{ clientMessageId: number; doctorItemNote: string; itemStatus: string }> = [];
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith('itemNote_')) {
+      const clientMessageId = Number(key.replace('itemNote_', ''));
+      const itemStatus = String(formData.get(`itemStatus_${clientMessageId}`) ?? 'approved');
+      items.push({
+        clientMessageId,
+        doctorItemNote: String(value).trim(),
+        itemStatus,
+      });
+    }
+  }
+
   try {
-    await reviewRequest(`/reviews/${id}`, { status, note });
+    await authenticatedFetch(`/reviews/${id}`, 'PATCH', {
+      status,
+      doctorNote,
+      doctorSummaryNote,
+      items,
+    });
   } catch (error) {
     const message = error instanceof BackendError ? error.message : 'Keputusan tidak dapat disimpan';
     redirect(`/?case=${id}&error=${encodeURIComponent(message)}`);
