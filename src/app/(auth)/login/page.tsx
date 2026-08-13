@@ -23,8 +23,8 @@ export default async function LoginPage({
     <AuthShell
       visual={
         <AuthVisual
-          title="Verifikasi rekomendasi medis dengan konteks pasien yang jelas."
-          description="Review hanya menampilkan pertanyaan dan jawaban AI yang dipilih pasien."
+          title="Konsultasi Tidak Berhenti di Rumah Sakit"
+          description="Review progress kesehatan pasien secara berkala dengan bantuan AI tanpa menyebarkan data sensitif. Mudah, cepat, dan aman."
         />
       }
     >

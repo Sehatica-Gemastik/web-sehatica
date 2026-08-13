@@ -45,15 +45,17 @@ export function AuthVisual({
         aria-hidden="true"
       />
 
-      {backHref ? (
-        <Link
-          href={backHref}
-          className="relative z-[2] mt-6 ml-7 inline-flex items-center gap-1.5 border-0 bg-transparent p-0 text-[13px] font-medium text-neutral-700 no-underline hover:text-neutral-900 max-md:ml-6"
-        >
-          <ArrowLeft size={14} strokeWidth={2} />
-          {backLabel}
-        </Link>
-      ) : null}
+      <div className="relative z-[2] px-7 pt-7 max-md:px-6 max-md:pt-6">
+        {backHref ? (
+          <Link
+            href={backHref}
+            className="mt-4 inline-flex items-center gap-1.5 border-0 bg-transparent p-0 text-[13px] font-medium text-neutral-700 no-underline hover:text-neutral-900"
+          >
+            <ArrowLeft size={14} strokeWidth={2} />
+            {backLabel}
+          </Link>
+        ) : null}
+      </div>
 
       <div className="absolute right-0 bottom-0 left-0 z-[2] max-w-[520px] p-9 pb-10 max-md:relative max-md:px-6 max-md:py-7">
         <h1 className="m-0 mb-3.5 text-[clamp(24px,2.8vw,36px)] leading-[1.12] font-semibold tracking-tight text-neutral-900 max-md:text-2xl">

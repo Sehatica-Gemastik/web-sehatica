@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { logout } from '@/app/actions';
 import { Avatar } from '@/components/ui/avatar';
+import { SehaticaLogo } from '@/components/brand/sehatica-logo';
 import { cn } from '@/lib/utils';
 import type { DoctorSession } from '@/lib/backend';
 
@@ -57,7 +58,12 @@ export function DashboardShell({ doctor, children }: DashboardShellProps) {
           )}
         >
           <div className={cn('flex min-w-0 items-center gap-2.5', collapsed && 'justify-center')}>
-            <div className="h-6 w-6 shrink-0 rounded-md bg-teal-50" aria-hidden="true" />
+            <SehaticaLogo
+              href="/"
+              variant="on-light"
+              height={collapsed ? 24 : 28}
+              crop={collapsed}
+            />
           </div>
           <button
             type="button"
