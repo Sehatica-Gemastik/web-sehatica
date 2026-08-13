@@ -154,7 +154,7 @@ export function ProfilView({ doctor, error, updated }: ProfilViewProps) {
                   </p>
                 </div>
 
-                <div className="mt-6 grid gap-2.5">
+                <div className="mt-6 grid gap-2.5 pb-12">
                   <ContactPill icon={<Mail size={15} />} value={doctor.email} />
                   <ContactPill icon={<Phone size={15} />} value={formatPhoneDisplay(doctor.phone)} />
                 </div>
