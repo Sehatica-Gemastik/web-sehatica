@@ -36,59 +36,77 @@ export type DoctorProfile = {
   avatarInitials: string;
 };
 
-export type ReviewItem = {
-  id: number;
-  reviewId: number;
-  clientMessageId: number;
-  patientQuestion: string;
-  aiResponse: string;
-  safetyLevel: 'general' | 'review' | 'urgent';
-  doctorItemNote: string | null;
-  itemStatus: 'pending' | 'approved' | 'revised';
+export type QuestionnaireDay = {
+  date: string;
+  filled: boolean;
+  intensity?: 0 | 1 | 2 | 3 | 4;
 };
 
-export type ReviewCase = {
-  id: number;
-  userId: number;
-  patientName: string;
-  patientEmail: string;
-  patientPhone: string | null;
-  patientQuestion: string;
-  aiResponse: string;
-  safetyLevel: 'general' | 'review' | 'urgent';
-  patientNote: string | null;
-  reviewScope: 'bubble' | 'session' | 'history';
-  reviewType: 'paid' | 'voluntary';
-  requestStatus: 'open_pool' | 'permission_requested' | 'accepted' | 'declined';
-  isPaid: boolean;
-  qnaCount: number;
-  fee: string;
-  status: 'pending' | 'approved' | 'revised';
-  doctorNote: string | null;
-  doctorSummaryNote: string | null;
-  consentedAt: string;
-  decidedAt: string | null;
-  expiresAt: string;
-  items: ReviewItem[];
-};
-
-export type VoluntaryPoolItem = {
-  id: number;
-  patientInitials: string;
-  reviewScope: 'bubble' | 'session' | 'history';
-  qnaCount: number;
-  safetyLevel: 'general' | 'review' | 'urgent';
-  requestStatus: 'open_pool';
-  createdAt: string;
-  expiresAt: string;
-};
-
-export type PatientUser = {
+export type MonitorPatientSummary = {
   id: number;
   name: string;
-  email: string;
-  phone: string | null;
   avatarInitials: string;
+  age: number | null;
+  lastSyncAt: string | null;
+  overallRiskScore: number;
+};
+
+export type DoctorAppointment = {
+  id: string;
+  patientId: number;
+  title: string;
+  notes: string;
+  start: string;
+  end: string;
+};
+
+export type ChatMessageRole = 'user' | 'doctor';
+
+export type ChatMessage = {
+  id: number;
+  role: ChatMessageRole;
+  content: string;
+  createdAt: string;
+};
+
+export type ChatConversation = {
+  patientId: number;
+  unreadCount: number;
+  messages: ChatMessage[];
+};
+
+export type PtmTrendPoint = {
+  date: string;
+  overall: number;
+  diabetes: number;
+  hypertension: number;
+  heart_disease: number;
+  stroke: number;
+};
+
+export type MonitorRecordItem = {
+  id: number;
+  title: string;
+  type: string;
+  recordDate: string | null;
+  summary: string | null;
+  source: 'transfer' | 'record';
+  createdAt: string;
+};
+
+export type MonitorQuestionnaireItem = {
+  date: string;
+  screeningDone: boolean;
+  dailyLogCount: number;
+  factors: string[];
+  syncedAt: string;
+};
+
+export type MonitorPatientDetail = MonitorPatientSummary & {
+  ptmTrend: PtmTrendPoint[];
+  latestOverallScore: number;
+  records: MonitorRecordItem[];
+  questionnaireDays: QuestionnaireDay[];
 };
 
 export async function backendRequest<T>(path: string, init: RequestInit = {}, token?: string) {
@@ -130,54 +148,6 @@ export async function getDoctorSession(nextPath = '/') {
       redirect(`/api/auth/refresh?next=${encodeURIComponent(nextPath)}`);
     }
     throw error;
-  }
-}
-
-export async function getDoctorProfile() {
-  const { token } = await accessToken('/profile');
-  try {
-    return await backendRequest<DoctorProfile>('/doctors/me', {}, token);
-  } catch (error) {
-    if (error instanceof BackendError && error.status === 401) {
-      redirect('/api/auth/refresh?next=%2Fprofile');
-    }
-    throw error;
-  }
-}
-
-export async function getAssignedReviews() {
-  const { token } = await accessToken('/');
-  try {
-    return await backendRequest<ReviewCase[]>('/reviews/assigned', {}, token);
-  } catch (error) {
-    if (error instanceof BackendError && error.status === 401) {
-      redirect('/api/auth/refresh?next=%2F');
-    }
-    throw error;
-  }
-}
-
-export async function getVoluntaryPool() {
-  const { token } = await accessToken('/');
-  try {
-    return await backendRequest<VoluntaryPoolItem[]>('/reviews/voluntary-pool', {}, token);
-  } catch (error) {
-    if (error instanceof BackendError && error.status === 401) {
-      redirect('/api/auth/refresh?next=%2F');
-    }
-    return [];
-  }
-}
-
-export async function getPatientsList() {
-  const { token } = await accessToken('/');
-  try {
-    return await backendRequest<PatientUser[]>('/doctors/patients', {}, token);
-  } catch (error) {
-    if (error instanceof BackendError && error.status === 401) {
-      redirect('/api/auth/refresh?next=%2F');
-    }
-    return [];
   }
 }
 
