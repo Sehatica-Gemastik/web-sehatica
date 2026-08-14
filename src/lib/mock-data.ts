@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import type {
-  ChatConversation,
   DoctorAppointment,
   DoctorProfile,
   MonitorPatientDetail,
@@ -274,41 +273,6 @@ const MOCK_APPOINTMENTS: DoctorAppointment[] = [
   },
 ];
 
-function hoursAgo(hours: number) {
-  return dayjs().subtract(hours, 'hour').toISOString();
-}
-
-const MOCK_CHAT: ChatConversation[] = [
-  {
-    patientId: 1,
-    unreadCount: 2,
-    messages: [
-      { id: 101, role: 'user', content: 'Dok, gula darah pagi ini 186. Apakah perlu sesuaikan obat?', createdAt: hoursAgo(26) },
-      { id: 102, role: 'doctor', content: 'Terima kasih sudah update. Jangan ubah dosis dulu — catat makan malam kemarin dan kirim hasil lab terbaru ya.', createdAt: hoursAgo(25) },
-      { id: 103, role: 'user', content: 'Baik dok. Hasil lab bulan lalu HbA1c 7.8%.', createdAt: hoursAgo(3) },
-      { id: 104, role: 'user', content: 'Saya juga sering haus malam hari ini.', createdAt: hoursAgo(2) },
-    ],
-  },
-  {
-    patientId: 2,
-    unreadCount: 0,
-    messages: [
-      { id: 201, role: 'user', content: 'Dok, sesekali dada terasa berat setelah jalan cepat.', createdAt: hoursAgo(48) },
-      { id: 202, role: 'doctor', content: 'Catat frekuensi dan durasinya. Kalau disertai keringat dingin atau nyeri menjalar, segera ke IGD.', createdAt: hoursAgo(47) },
-      { id: 203, role: 'user', content: 'Siap dok, saya sudah kurangi kopi dan jalan pagi 20 menit.', createdAt: hoursAgo(5) },
-    ],
-  },
-  {
-    patientId: 3,
-    unreadCount: 1,
-    messages: [
-      { id: 301, role: 'user', content: 'Tekanan darah di rumah 158/96, dok.', createdAt: hoursAgo(12) },
-      { id: 302, role: 'doctor', content: 'Coba ukur ulang setelah istirahat 5 menit. Hindari garam berlebih hari ini.', createdAt: hoursAgo(11) },
-      { id: 303, role: 'user', content: 'Sudah dok, sekarang 142/88.', createdAt: hoursAgo(1) },
-    ],
-  },
-];
-
 export function getMockMonitorPatients(): MonitorPatientSummary[] {
   return MOCK_PATIENTS;
 }
@@ -322,14 +286,6 @@ export function getMockMonitorPatientDetail(patientId: number): MonitorPatientDe
 
 export function getMockAppointments(patientId: number): DoctorAppointment[] {
   return MOCK_APPOINTMENTS.filter((appointment) => appointment.patientId === patientId);
-}
-
-export function getMockChatConversations(): ChatConversation[] {
-  return MOCK_CHAT;
-}
-
-export function getMockChatConversation(patientId: number): ChatConversation | null {
-  return MOCK_CHAT.find((conversation) => conversation.patientId === patientId) ?? null;
 }
 
 export function getMockDoctorProfile(session: {

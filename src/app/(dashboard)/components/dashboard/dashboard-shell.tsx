@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  MessageSquare,
   UserRound,
 } from 'lucide-react';
 import { logout } from '@/app/actions';
@@ -20,7 +19,6 @@ import type { DoctorSession } from '@/lib/backend';
 
 const NAV = [
   { href: '/', label: 'Monitor', icon: Activity },
-  { href: '/pesan', label: 'Pesan', icon: MessageSquare },
   { href: '/jadwal', label: 'Jadwal', icon: CalendarDays },
   { href: '/profil', label: 'Profil', icon: UserRound },
 ] as const;
@@ -34,9 +32,8 @@ export function DashboardShell({ doctor, children }: DashboardShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const isJadwal = pathname.startsWith('/jadwal');
-  const isPesan = pathname.startsWith('/pesan');
   const isProfil = pathname.startsWith('/profil');
-  const isFullBleed = isJadwal || isPesan || isProfil;
+  const isFullBleed = isJadwal || isProfil;
 
   return (
     <div

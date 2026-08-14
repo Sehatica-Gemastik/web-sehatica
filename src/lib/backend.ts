@@ -60,21 +60,6 @@ export type DoctorAppointment = {
   end: string;
 };
 
-export type ChatMessageRole = 'user' | 'doctor';
-
-export type ChatMessage = {
-  id: number;
-  role: ChatMessageRole;
-  content: string;
-  createdAt: string;
-};
-
-export type ChatConversation = {
-  patientId: number;
-  unreadCount: number;
-  messages: ChatMessage[];
-};
-
 export type PtmTrendPoint = {
   date: string;
   overall: number;
