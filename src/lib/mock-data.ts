@@ -1,11 +1,14 @@
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import type {
+  DailyQuestionnaireLog,
   DoctorAppointment,
   DoctorProfile,
   MonitorPatientDetail,
   MonitorPatientSummary,
   MonitorQuestionnaireItem,
+  PatientIdentity,
+  PatientWeeklyCheckin,
   PtmTrendPoint,
   QuestionnaireDay,
 } from './backend';
@@ -81,6 +84,124 @@ function buildQuestionnaireDays(
   });
 }
 
+function buildDailyLog(
+  date: string,
+  profile: {
+    sedentaryMinutes: number;
+    totalActivityMinutes: number;
+    calories: number;
+    protein: number;
+    carbs: number;
+    sugar: number;
+    fat: number;
+    satFat: number;
+    sodium: number;
+    fiber: number;
+    cholesterol: number;
+    alcoholEver: number;
+    alcoholFrequency?: number;
+    alcoholDrinks?: number;
+    alcoholBinge?: number;
+    mealsCount: number;
+    aiSummary: string;
+  },
+): DailyQuestionnaireLog {
+  const completedAt = `${date}T07:30:00.000Z`;
+  return {
+    date,
+    completedAt,
+    vigorousWork: 0,
+    vigorousWorkDays: 0,
+    vigorousWorkMinutes: 0,
+    moderateWork: 1,
+    moderateWorkDays: 3,
+    moderateWorkMinutes: 45,
+    transportWalkingBiking: 1,
+    transportDays: 2,
+    transportMinutes: 30,
+    vigorousRecreation: profile.totalActivityMinutes > 60 ? 1 : 0,
+    vigorousRecreationDays: profile.totalActivityMinutes > 60 ? 2 : 0,
+    vigorousRecreationMinutes: profile.totalActivityMinutes > 60 ? 40 : 0,
+    moderateRecreation: 1,
+    moderateRecreationDays: 2,
+    moderateRecreationMinutes: 30,
+    sedentaryMinutes: profile.sedentaryMinutes,
+    totalActivityMinutes: profile.totalActivityMinutes,
+    caloriesDay1: profile.calories,
+    proteinGDay1: profile.protein,
+    carbohydrateGDay1: profile.carbs,
+    sugarGDay1: profile.sugar,
+    totalFatGDay1: profile.fat,
+    saturatedFatGDay1: profile.satFat,
+    sodiumMgDay1: profile.sodium,
+    fiberGDay1: profile.fiber,
+    cholesterolMgDay1: profile.cholesterol,
+    alcoholEver: profile.alcoholEver,
+    alcoholFrequency: profile.alcoholFrequency ?? null,
+    alcoholDrinksPerDay: profile.alcoholDrinks ?? null,
+    alcoholBingeFrequency: profile.alcoholBinge ?? null,
+    mealsCount: profile.mealsCount,
+    aiSummary: profile.aiSummary,
+  };
+}
+
+const PATIENT_IDENTITIES: Record<number, PatientIdentity> = {
+  1: {
+    age: 58,
+    sex: 1,
+    raceEthnicity: 6,
+    education: 3,
+    incomePovertyRatio: 2,
+    completedAt: `${daysAgo(120)}T10:00:00.000Z`,
+  },
+  2: {
+    age: 45,
+    sex: 2,
+    raceEthnicity: 6,
+    education: 5,
+    incomePovertyRatio: 3,
+    completedAt: `${daysAgo(90)}T09:00:00.000Z`,
+  },
+  3: {
+    age: 60,
+    sex: 1,
+    raceEthnicity: 6,
+    education: 4,
+    incomePovertyRatio: 2,
+    completedAt: `${daysAgo(60)}T08:00:00.000Z`,
+  },
+};
+
+const PATIENT_WEEKLY: Record<number, PatientWeeklyCheckin> = {
+  1: {
+    weightKg: 78,
+    heightCm: 168,
+    bmi: 27.6,
+    waistCm: 92,
+    systolicBp: 138,
+    diastolicBp: 86,
+    completedAt: `${daysAgo(3)}T06:00:00.000Z`,
+  },
+  2: {
+    weightKg: 65,
+    heightCm: 162,
+    bmi: 24.8,
+    waistCm: 78,
+    systolicBp: 122,
+    diastolicBp: 78,
+    completedAt: `${daysAgo(5)}T07:00:00.000Z`,
+  },
+  3: {
+    weightKg: 82,
+    heightCm: 170,
+    bmi: 28.4,
+    waistCm: 96,
+    systolicBp: 148,
+    diastolicBp: 92,
+    completedAt: `${daysAgo(1)}T06:30:00.000Z`,
+  },
+};
+
 const PATIENT_PROFILES: Record<number, DiseaseProfile> = {
   1: {
     overall: 0.64,
@@ -137,6 +258,44 @@ const MOCK_PATIENTS: MonitorPatientSummary[] = [
 
 const MOCK_DETAILS: Record<number, Omit<MonitorPatientDetail, keyof MonitorPatientSummary>> = {
   1: {
+    identity: PATIENT_IDENTITIES[1],
+    weekly: PATIENT_WEEKLY[1],
+    dailyLogs: {
+      [daysAgo(0)]: buildDailyLog(daysAgo(0), {
+        sedentaryMinutes: 420,
+        totalActivityMinutes: 75,
+        calories: 1850,
+        protein: 72,
+        carbs: 210,
+        sugar: 48,
+        fat: 62,
+        satFat: 18,
+        sodium: 2100,
+        fiber: 22,
+        cholesterol: 180,
+        alcoholEver: 0,
+        mealsCount: 3,
+        aiSummary:
+          'Pasien melaporkan aktivitas sedang rutin dan asupan kalori moderat. Gula dan natrium masih di atas target harian — pertimbangkan edukasi pola makan rendah garam dan kurangi minuman manis.',
+      }),
+      [daysAgo(1)]: buildDailyLog(daysAgo(1), {
+        sedentaryMinutes: 480,
+        totalActivityMinutes: 45,
+        calories: 1920,
+        protein: 68,
+        carbs: 225,
+        sugar: 55,
+        fat: 65,
+        satFat: 20,
+        sodium: 2300,
+        fiber: 18,
+        cholesterol: 195,
+        alcoholEver: 0,
+        mealsCount: 2,
+        aiSummary:
+          'Hari ini waktu duduk lebih lama dan aktivitas fisik menurun. Asupan gula dan natrium sedikit meningkat dibanding rata-rata — pantau konsistensi pengisian kuisioner besok.',
+      }),
+    },
     ptmTrend: buildDailyTrend(PATIENT_PROFILES[1]),
     latestOverallScore: PATIENT_PROFILES[1].overall,
     records: [
@@ -177,6 +336,9 @@ const MOCK_DETAILS: Record<number, Omit<MonitorPatientDetail, keyof MonitorPatie
     ]),
   },
   2: {
+    identity: PATIENT_IDENTITIES[2],
+    weekly: PATIENT_WEEKLY[2],
+    dailyLogs: {},
     ptmTrend: buildDailyTrend(PATIENT_PROFILES[2]),
     latestOverallScore: PATIENT_PROFILES[2].overall,
     records: [
@@ -201,6 +363,47 @@ const MOCK_DETAILS: Record<number, Omit<MonitorPatientDetail, keyof MonitorPatie
     ]),
   },
   3: {
+    identity: PATIENT_IDENTITIES[3],
+    weekly: PATIENT_WEEKLY[3],
+    dailyLogs: {
+      [daysAgo(0)]: buildDailyLog(daysAgo(0), {
+        sedentaryMinutes: 360,
+        totalActivityMinutes: 90,
+        calories: 1750,
+        protein: 80,
+        carbs: 190,
+        sugar: 35,
+        fat: 58,
+        satFat: 15,
+        sodium: 1900,
+        fiber: 28,
+        cholesterol: 165,
+        alcoholEver: 1,
+        alcoholFrequency: 6,
+        alcoholDrinks: 2,
+        alcoholBinge: 0,
+        mealsCount: 4,
+        aiSummary:
+          'Aktivitas fisik cukup baik dengan waktu duduk terkendali. Asupan serat memadai, namun tekanan darah dari cek mingguan masih tinggi — lanjutkan pantau garam dan konsumsi alkohol sesekali.',
+      }),
+      [daysAgo(2)]: buildDailyLog(daysAgo(2), {
+        sedentaryMinutes: 390,
+        totalActivityMinutes: 60,
+        calories: 1800,
+        protein: 75,
+        carbs: 200,
+        sugar: 40,
+        fat: 60,
+        satFat: 16,
+        sodium: 2000,
+        fiber: 24,
+        cholesterol: 170,
+        alcoholEver: 0,
+        mealsCount: 3,
+        aiSummary:
+          'Pola makan relatif seimbang dengan aktivitas sedang. Tidak ada konsumsi alkohol dilaporkan — pertahankan konsistensi pengisian harian.',
+      }),
+    },
     ptmTrend: buildDailyTrend(PATIENT_PROFILES[3]),
     latestOverallScore: PATIENT_PROFILES[3].overall,
     records: [
@@ -282,6 +485,54 @@ export function getMockMonitorPatientDetail(patientId: number): MonitorPatientDe
   const detail = MOCK_DETAILS[patientId];
   if (!summary || !detail) return null;
   return { ...summary, ...detail };
+}
+
+export function getLatestDailyAiSummary(
+  patientId: number,
+): { date: string; summary: string } | null {
+  const detail = MOCK_DETAILS[patientId];
+  if (!detail) return null;
+
+  for (let index = detail.questionnaireDays.length - 1; index >= 0; index -= 1) {
+    const day = detail.questionnaireDays[index];
+    if (!day.filled) continue;
+    const log = getMockDailyQuestionnaireLog(patientId, day.date);
+    if (log) return { date: day.date, summary: log.aiSummary };
+  }
+
+  return null;
+}
+
+export function getMockDailyQuestionnaireLog(
+  patientId: number,
+  date: string,
+): DailyQuestionnaireLog | null {
+  const detail = MOCK_DETAILS[patientId];
+  if (!detail) return null;
+
+  const explicit = detail.dailyLogs[date];
+  if (explicit) return explicit;
+
+  const day = detail.questionnaireDays.find((entry) => entry.date === date);
+  if (!day?.filled) return null;
+
+  return buildDailyLog(date, {
+    sedentaryMinutes: 400 + (patientId * 10),
+    totalActivityMinutes: 50 + (patientId * 5),
+    calories: 1800,
+    protein: 70,
+    carbs: 200,
+    sugar: 42,
+    fat: 60,
+    satFat: 17,
+    sodium: 2050,
+    fiber: 20,
+    cholesterol: 175,
+    alcoholEver: 0,
+    mealsCount: 3,
+    aiSummary:
+      'Mock ai summary',
+  });
 }
 
 export function getMockAppointments(patientId: number): DoctorAppointment[] {

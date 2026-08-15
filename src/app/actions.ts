@@ -7,9 +7,16 @@ import {
   ACCESS_COOKIE,
   BackendError,
   REFRESH_COOKIE,
+  accessToken,
   backendRequest,
   sessionCookieOptions,
 } from '@/lib/backend';
+import {
+  createDoctorAppointmentApi,
+  deleteDoctorAppointmentApi,
+  updateDoctorAppointmentApi,
+  updateDoctorProfileApi,
+} from '@/lib/doctor-api';
 
 type AuthPayload = {
   user: { id: number; name: string; role: 'user' | 'doctor' | 'admin' };
@@ -76,12 +83,92 @@ export async function registerDoctor(formData: FormData) {
   redirect('/');
 }
 
-export async function updateDoctorProfile(_formData: FormData) {
-  const cookieStore = await cookies();
-  if (!cookieStore.get(ACCESS_COOKIE)?.value) redirect('/login');
+export async function updateDoctorProfile(formData: FormData) {
+  const { token } = await accessToken('/profil');
+  const name = String(formData.get('name') ?? '').trim();
+  const phoneCountry = String(formData.get('phoneCountry') ?? '+62').trim();
+  const phoneLocal = String(formData.get('phone') ?? '').trim().replace(/\D/g, '');
+  const specialty = String(formData.get('specialty') ?? '').trim();
+  const bio = String(formData.get('bio') ?? '').trim();
+  const phone = phoneLocal ? `${phoneCountry}${phoneLocal}` : '';
+
+  if (!name || !specialty) {
+    redirect('/profil?error=Nama+dan+spesialisasi+wajib+diisi');
+  }
+
+  try {
+    await updateDoctorProfileApi(token, { name, phone, specialty, bio });
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal menyimpan profil';
+    redirect(`/profil?error=${encodeURIComponent(message)}`);
+  }
 
   revalidatePath('/profil');
   redirect('/profil?updated=1');
+}
+
+export async function createAppointment(input: {
+  patientId: number;
+  title: string;
+  notes: string;
+  start: string;
+  end: string;
+}) {
+  const { token } = await accessToken('/jadwal');
+
+  try {
+    await createDoctorAppointmentApi(token, {
+      patientId: input.patientId,
+      title: input.title,
+      notes: input.notes,
+      start: input.start,
+      end: input.end,
+    });
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal menyimpan janji';
+    throw new Error(message);
+  }
+
+  revalidatePath('/jadwal');
+}
+
+export async function updateAppointment(input: {
+  id: string;
+  patientId: number;
+  title: string;
+  notes: string;
+  start: string;
+  end: string;
+}) {
+  const { token } = await accessToken('/jadwal');
+
+  try {
+    await updateDoctorAppointmentApi(token, input.id, {
+      patientId: input.patientId,
+      title: input.title,
+      notes: input.notes,
+      start: input.start,
+      end: input.end,
+    });
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal memperbarui janji';
+    throw new Error(message);
+  }
+
+  revalidatePath('/jadwal');
+}
+
+export async function deleteAppointment(id: string) {
+  const { token } = await accessToken('/jadwal');
+
+  try {
+    await deleteDoctorAppointmentApi(token, id);
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal menghapus janji';
+    throw new Error(message);
+  }
+
+  revalidatePath('/jadwal');
 }
 
 export async function logout() {

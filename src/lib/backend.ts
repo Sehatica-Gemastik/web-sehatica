@@ -42,6 +42,62 @@ export type QuestionnaireDay = {
   intensity?: 0 | 1 | 2 | 3 | 4;
 };
 
+export type PatientIdentity = {
+  age: number;
+  sex: number;
+  raceEthnicity: number;
+  education: number;
+  incomePovertyRatio: number;
+  completedAt: string;
+};
+
+export type PatientWeeklyCheckin = {
+  weightKg: number;
+  heightCm: number;
+  bmi: number;
+  waistCm: number;
+  systolicBp: number;
+  diastolicBp: number;
+  completedAt: string;
+};
+
+export type DailyQuestionnaireLog = {
+  date: string;
+  completedAt: string;
+  vigorousWork: number;
+  vigorousWorkDays: number;
+  vigorousWorkMinutes: number;
+  moderateWork: number;
+  moderateWorkDays: number;
+  moderateWorkMinutes: number;
+  transportWalkingBiking: number;
+  transportDays: number;
+  transportMinutes: number;
+  vigorousRecreation: number;
+  vigorousRecreationDays: number;
+  vigorousRecreationMinutes: number;
+  moderateRecreation: number;
+  moderateRecreationDays: number;
+  moderateRecreationMinutes: number;
+  sedentaryMinutes: number;
+  totalActivityMinutes: number;
+  caloriesDay1: number;
+  proteinGDay1: number;
+  carbohydrateGDay1: number;
+  sugarGDay1: number;
+  totalFatGDay1: number;
+  saturatedFatGDay1: number;
+  sodiumMgDay1: number;
+  fiberGDay1: number;
+  cholesterolMgDay1: number;
+  alcoholEver: number;
+  alcoholFrequency: number | null;
+  alcoholDrinksPerDay: number | null;
+  alcoholBingeFrequency: number | null;
+  mealsCount: number;
+  aiSummary: string;
+};
+
 export type MonitorPatientSummary = {
   id: number;
   name: string;
@@ -58,6 +114,7 @@ export type DoctorAppointment = {
   notes: string;
   start: string;
   end: string;
+  status?: string;
 };
 
 export type PtmTrendPoint = {
@@ -88,6 +145,9 @@ export type MonitorQuestionnaireItem = {
 };
 
 export type MonitorPatientDetail = MonitorPatientSummary & {
+  identity: PatientIdentity;
+  weekly: PatientWeeklyCheckin | null;
+  dailyLogs: Record<string, DailyQuestionnaireLog>;
   ptmTrend: PtmTrendPoint[];
   latestOverallScore: number;
   records: MonitorRecordItem[];

@@ -32,6 +32,7 @@ type WeekCalendarProps = {
   appointments: DoctorAppointment[];
   onWeekChange: (next: Dayjs) => void;
   onSlotClick: (slot: AppointmentSlot) => void;
+  onEventClick: (appointment: DoctorAppointment) => void;
 };
 
 function eventColor(id: string) {
@@ -57,7 +58,13 @@ function getEventStyle(start: Dayjs, end: Dayjs) {
   return { top, height };
 }
 
-export function WeekCalendar({ weekStart, appointments, onWeekChange, onSlotClick }: WeekCalendarProps) {
+export function WeekCalendar({
+  weekStart,
+  appointments,
+  onWeekChange,
+  onSlotClick,
+  onEventClick,
+}: WeekCalendarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const now = dayjs();
 
@@ -212,7 +219,7 @@ export function WeekCalendar({ weekStart, appointments, onWeekChange, onSlotClic
                     style={{ top: top + 2, height }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSlotClick({ start: event.startAt, end: event.endAt });
+                      onEventClick(event);
                     }}
                   >
                     <p className="truncate text-xs font-semibold leading-tight">{event.title}</p>

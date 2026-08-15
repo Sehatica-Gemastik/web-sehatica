@@ -1,6 +1,6 @@
 'use client';
 
-import { Download, FileText, Upload } from 'lucide-react';
+import { Download, FileText, Upload, FileArchive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { MonitorRecordItem } from '@/lib/backend';
 
@@ -34,8 +34,11 @@ export function RecordsList({ records }: RecordsListProps) {
       </div>
 
       {visibleRecords.length === 0 ? (
-        <div className="rounded-lg px-6 py-6 text-sm text-neutral-500">
-          Belum ada rekam medis yang diterima.
+        <div className="flex flex-col gap-2 py-32 rounded-lg items-center justify-center">
+          <FileArchive size={42} className='text-neutral-200'/>
+          <h3 className='text-sm text-neutral-400'>
+            Belum ada rekam medis yang diterima.
+          </h3>
         </div>
       ) : (
         <div className="grid gap-2.5">

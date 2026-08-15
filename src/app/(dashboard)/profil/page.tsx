@@ -1,6 +1,6 @@
 import { ProfilView } from '@/app/(dashboard)/components/profil/profil-view';
-import { getDoctorSession } from '@/lib/backend';
-import { getMockDoctorProfile } from '@/lib/mock-data';
+import { accessToken } from '@/lib/backend';
+import { getDoctorProfile } from '@/lib/doctor-api';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,8 +10,8 @@ export default async function ProfilPage({
   searchParams: Promise<{ error?: string; updated?: string }>;
 }) {
   const params = await searchParams;
-  const session = await getDoctorSession('/profil');
-  const doctor = getMockDoctorProfile(session);
+  const { token } = await accessToken('/profil');
+  const doctor = await getDoctorProfile(token);
 
   return (
     <ProfilView
