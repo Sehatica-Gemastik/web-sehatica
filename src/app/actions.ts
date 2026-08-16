@@ -13,7 +13,9 @@ import {
 } from '@/lib/backend';
 import {
   createDoctorAppointmentApi,
+  createPatientRecordApi,
   deleteDoctorAppointmentApi,
+  revokePartnerPatientApi,
   updateDoctorAppointmentApi,
   updateDoctorProfileApi,
 } from '@/lib/doctor-api';
@@ -169,6 +171,45 @@ export async function deleteAppointment(id: string) {
   }
 
   revalidatePath('/jadwal');
+}
+
+export async function createPatientRecord(input: {
+  patientId: number;
+  type: 'consultation' | 'image' | 'voice' | 'note';
+  title: string;
+  content: string;
+  doctorName: string;
+  recordDate: string;
+}) {
+  const { token } = await accessToken('/');
+
+  try {
+    await createPatientRecordApi(token, input.patientId, {
+      type: input.type,
+      title: input.title,
+      content: input.content || undefined,
+      doctorName: input.doctorName || undefined,
+      recordDate: input.recordDate || undefined,
+    });
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal menyimpan rekam medis';
+    throw new Error(message);
+  }
+
+  revalidatePath('/');
+}
+
+export async function revokePatient(patientId: number) {
+  const { token } = await accessToken('/pengaturan');
+
+  try {
+    await revokePartnerPatientApi(token, patientId);
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal mencabut pasien';
+    throw new Error(message);
+  }
+
+  revalidatePath('/pengaturan');
 }
 
 export async function logout() {

@@ -57,7 +57,7 @@ export default async function MonitorPage({
             days={detail.questionnaireDays}
             latestSummary={latestSummary}
           />
-          <RecordsList records={detail.records} />
+          <RecordsList records={detail.records} patientId={activeId!} />
         </>
       ) : (
         <div className="rounded-lg bg-neutral-50 px-6 py-6 text-sm text-neutral-500">
