@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Settings,
   UserRound,
 } from 'lucide-react';
 import { logout } from '@/app/actions';
@@ -20,6 +21,7 @@ import type { DoctorSession } from '@/lib/backend';
 const NAV = [
   { href: '/', label: 'Monitor', icon: Activity },
   { href: '/jadwal', label: 'Jadwal', icon: CalendarDays },
+  { href: '/pengaturan', label: 'Pengaturan', icon: Settings },
   { href: '/profil', label: 'Profil', icon: UserRound },
 ] as const;
 
