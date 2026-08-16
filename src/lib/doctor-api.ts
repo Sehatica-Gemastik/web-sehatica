@@ -5,6 +5,7 @@ import {
   type DoctorProfile,
   type MonitorPatientDetail,
   type MonitorPatientSummary,
+  type MonitorRecordItem,
 } from './backend';
 
 export async function getDoctorProfile(token: string) {
@@ -80,6 +81,29 @@ export async function updateDoctorAppointmentApi(
 
 export async function deleteDoctorAppointmentApi(token: string, id: string) {
   return backendRequest<{ deleted: boolean }>(`/portal/appointments/${id}`, {
+    method: 'DELETE',
+  }, token);
+}
+
+export async function createPatientRecordApi(
+  token: string,
+  patientId: number,
+  input: {
+    type: 'consultation' | 'image' | 'voice' | 'note';
+    title: string;
+    content?: string;
+    doctorName?: string;
+    recordDate?: string;
+  },
+) {
+  return backendRequest<MonitorRecordItem>(`/portal/patients/${patientId}/records`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  }, token);
+}
+
+export async function revokePartnerPatientApi(token: string, patientId: number) {
+  return backendRequest<{ deleted: boolean }>(`/portal/patients/${patientId}`, {
     method: 'DELETE',
   }, token);
 }
