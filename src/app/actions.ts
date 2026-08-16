@@ -15,6 +15,7 @@ import {
   createDoctorAppointmentApi,
   createPatientRecordApi,
   deleteDoctorAppointmentApi,
+  deletePatientRecordApi,
   revokePartnerPatientApi,
   updateDoctorAppointmentApi,
   updateDoctorProfileApi,
@@ -175,21 +176,17 @@ export async function deleteAppointment(id: string) {
 
 export async function createPatientRecord(input: {
   patientId: number;
-  type: 'consultation' | 'image' | 'voice' | 'note';
   title: string;
-  content: string;
-  doctorName: string;
-  recordDate: string;
+  fileName: string;
+  fileBase64: string;
 }) {
   const { token } = await accessToken('/');
 
   try {
     await createPatientRecordApi(token, input.patientId, {
-      type: input.type,
       title: input.title,
-      content: input.content || undefined,
-      doctorName: input.doctorName || undefined,
-      recordDate: input.recordDate || undefined,
+      fileName: input.fileName,
+      fileBase64: input.fileBase64,
     });
   } catch (error) {
     const message = error instanceof BackendError ? error.message : 'Gagal menyimpan rekam medis';
@@ -197,6 +194,48 @@ export async function createPatientRecord(input: {
   }
 
   revalidatePath('/');
+}
+
+export async function deletePatientRecord(patientId: number, recordId: number) {
+  const { token } = await accessToken('/');
+
+  try {
+    await deletePatientRecordApi(token, patientId, recordId);
+  } catch (error) {
+    const message = error instanceof BackendError ? error.message : 'Gagal menghapus rekam medis';
+    throw new Error(message);
+  }
+
+  revalidatePath('/');
+}
+
+export async function downloadPatientRecordFile(patientId: number, recordId: number) {
+  const { token } = await accessToken('/');
+  const { BACKEND_URL } = await import('@/lib/backend');
+
+  const response = await fetch(
+    `${BACKEND_URL}/portal/patients/${patientId}/records/${recordId}/file`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    const message = response.status === 404
+      ? 'File rekam medis tidak ditemukan'
+      : 'Gagal mengunduh file';
+    throw new Error(message);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = disposition.match(/filename="?([^"]+)"?/i);
+  return {
+    base64: buffer.toString('base64'),
+    fileName: match?.[1] ?? `rekam-medis-${recordId}.pdf`,
+    mimeType: response.headers.get('Content-Type') ?? 'application/pdf',
+  };
 }
 
 export async function revokePatient(patientId: number) {

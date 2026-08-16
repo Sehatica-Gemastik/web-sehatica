@@ -133,6 +133,7 @@ export type MonitorRecordItem = {
   recordDate: string | null;
   summary: string | null;
   source: 'transfer' | 'record';
+  fileUrl: string | null;
   createdAt: string;
 };
 

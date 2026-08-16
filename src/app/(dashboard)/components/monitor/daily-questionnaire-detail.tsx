@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import { ChevronLeft, Sparkles } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import {
   ALCOHOL_FREQUENCY_LABELS,
   BINGE_FREQUENCY_LABELS,
-  formatDateId,
   formatDateTimeId,
   optionLabel,
   yesNoLabel,
@@ -115,14 +114,6 @@ export function DailyQuestionnaireDetail({ log, patientName, backHref }: DailyQu
             Diselesaikan pada {formatDateTimeId(log.completedAt)}
           </p>
         </div>
-      </div>
-
-      <div className="rounded-xl border border-teal-100 bg-linear-to-br from-teal-50/80 to-white p-5">
-        <div className="mb-2 flex items-center gap-2 text-teal-700">
-          <Sparkles size={16} />
-          <span className="text-xs font-semibold uppercase tracking-wide">Ringkasan AI</span>
-        </div>
-        <p className="text-sm leading-relaxed text-neutral-700">{log.aiSummary}</p>
       </div>
 
       <div className="grid gap-4">

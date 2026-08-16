@@ -89,17 +89,33 @@ export async function createPatientRecordApi(
   token: string,
   patientId: number,
   input: {
-    type: 'consultation' | 'image' | 'voice' | 'note';
     title: string;
-    content?: string;
-    doctorName?: string;
-    recordDate?: string;
+    fileName: string;
+    fileBase64: string;
+    type?: 'consultation' | 'image' | 'voice' | 'note';
   },
 ) {
   return backendRequest<MonitorRecordItem>(`/portal/patients/${patientId}/records`, {
     method: 'POST',
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      type: input.type ?? 'image',
+      title: input.title,
+      fileName: input.fileName,
+      fileBase64: input.fileBase64,
+    }),
   }, token);
+}
+
+export async function deletePatientRecordApi(
+  token: string,
+  patientId: number,
+  recordId: number,
+) {
+  return backendRequest<{ deleted: boolean }>(
+    `/portal/patients/${patientId}/records/${recordId}`,
+    { method: 'DELETE' },
+    token,
+  );
 }
 
 export async function revokePartnerPatientApi(token: string, patientId: number) {
