@@ -104,7 +104,7 @@ export function DashboardShell({ doctor, children }: DashboardShellProps) {
           <Link
             href="/profil"
             className={cn(
-              'flex w-full items-center rounded-lg no-underline hover:bg-black/5',
+              'flex w-full items-center rounded-lg no-underline hover:bg-black/8 bg-black/5',
               collapsed ? 'justify-center px-0 py-2' : 'gap-2 px-2.5 py-2',
             )}
           >
