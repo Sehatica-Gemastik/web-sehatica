@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers';
 import { ACCESS_COOKIE, BACKEND_URL } from '@/lib/backend';
 
+export const maxDuration = 60;
+
 type Envelope = { success: boolean; data?: unknown; error?: string };
 
 export async function POST(
